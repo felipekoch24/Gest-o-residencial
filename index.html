@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão Residencial - Felipe</title>
+    <style>
+        :root { --azul: #004488; --azul-claro: #0066CC; --cinza: #F2F2F2; }
+        body { font-family: sans-serif; background-color: var(--cinza); margin: 0; padding: 0; }
+        
+        /* Menu Superior */
+        .navbar { display: flex; background: var(--azul); position: sticky; top: 0; z-index: 100; }
+        .nav-btn { flex: 1; padding: 15px; border: none; background: none; color: white; font-weight: bold; cursor: pointer; border-bottom: 4px solid transparent; }
+        .nav-btn.active { border-bottom: 4px solid #fff; background: rgba(255,255,255,0.1); }
+
+        .container { padding: 20px; max-width: 500px; margin: auto; }
+        .secao { display: none; }
+        .secao.active { display: block; }
+
+        h2 { text-align: center; color: var(--azul); margin-top: 0; }
+        .card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; }
+        
+        label { display: block; font-size: 12px; font-weight: bold; margin: 10px 0 5px; color: #444; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 16px; text-align: center; }
+        .info-ant { font-size: 11px; color: #666; font-style: italic; margin-bottom: 5px; }
+
+        button.main-btn { width: 100%; padding: 15px; border: none; border-radius: 5px; color: white; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        .btn-calc { background-color: var(--azul); }
+        .btn-zap { background-color: #25D366; display: none; }
+        .btn-reset { background: none; color: red; font-size: 12px; border: none; margin-top: 20px; width: 100%; opacity: 0.6; }
+
+        #res-agua, #res-luz { background: #e7f3ff; padding: 15px; border-radius: 5px; margin-top: 15px; font-family: monospace; white-space: pre-wrap; display: none; border-left: 5px solid var(--azul); }
+        footer { text-align: center; padding: 20px; color: #999; font-size: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <button class="nav-btn active" onclick="switchTab('agua', this)">ÁGUA</button>
+    <button class="nav-btn" onclick="switchTab('luz', this)">LUZ</button>
+</div>
+
+<div class="container">
+    
+    <div id="agua" class="secao active">
+        <h2>CONTROLE DE ÁGUA</h2>
+        <div class="card">
+            <label>VALOR TOTAL DA CONTA (R$)</label>
+            <input type="number" id="agua_total_rs" step="0.01">
+            
+            <label>TAXA FIXA (R$)</label>
+            <input type="number" id="agua_taxa" value="82.06" step="0.01">
+            
+            <label>CONSUMO TOTAL DA CONTA (m³)</label>
+            <input type="number" id="agua_total_m3" step="0.1">
+        </div>
+
+        <div class="card">
+            <label>CASA 2 (Atual)</label>
+            <div id="ant_agua_2" class="info-ant">Anterior: 0</div>
+            <input type="number" id="agua_2_at" step="0.1">
+
+            <label>CASA 3 (Atual)</label>
+            <div id="ant_agua_3" class="info-ant">Anterior: 0</div>
+            <input type="number" id="agua_3_at" step="0.1">
+        </div>
+
+        <button class="main-btn btn-calc" onclick="calcularAgua()">CALCULAR ÁGUA</button>
+        <div id="res-agua"></div>
+        <button id="zap-agua" class="main
