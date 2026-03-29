@@ -2,69 +2,73 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão Residencial - Felipe</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="google" content="notranslate">
+    <title>Contas Casa</title>
     <style>
-        :root { --azul: #004488; --azul-claro: #0066CC; --cinza: #F2F2F2; }
-        body { font-family: sans-serif; background-color: var(--cinza); margin: 0; padding: 0; }
-        
-        /* Menu Superior */
+        :root { --azul: #004488; --cinza: #f4f4f9; }
+        body { font-family: sans-serif; margin: 0; background: var(--cinza); user-select: none; }
         .navbar { display: flex; background: var(--azul); position: sticky; top: 0; z-index: 100; }
-        .nav-btn { flex: 1; padding: 15px; border: none; background: none; color: white; font-weight: bold; cursor: pointer; border-bottom: 4px solid transparent; }
-        .nav-btn.active { border-bottom: 4px solid #fff; background: rgba(255,255,255,0.1); }
-
+        .nav-btn { flex: 1; padding: 15px; border: none; background: none; color: white; font-weight: bold; font-size: 16px; cursor: pointer; opacity: 0.6; }
+        .nav-btn.active { opacity: 1; border-bottom: 4px solid white; }
         .container { padding: 20px; max-width: 500px; margin: auto; }
-        .secao { display: none; }
-        .secao.active { display: block; }
-
-        h2 { text-align: center; color: var(--azul); margin-top: 0; }
-        .card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; }
-        
-        label { display: block; font-size: 12px; font-weight: bold; margin: 10px 0 5px; color: #444; }
-        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 16px; text-align: center; }
-        .info-ant { font-size: 11px; color: #666; font-style: italic; margin-bottom: 5px; }
-
-        button.main-btn { width: 100%; padding: 15px; border: none; border-radius: 5px; color: white; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; }
-        .btn-calc { background-color: var(--azul); }
-        .btn-zap { background-color: #25D366; display: none; }
-        .btn-reset { background: none; color: red; font-size: 12px; border: none; margin-top: 20px; width: 100%; opacity: 0.6; }
-
-        #res-agua, #res-luz { background: #e7f3ff; padding: 15px; border-radius: 5px; margin-top: 15px; font-family: monospace; white-space: pre-wrap; display: none; border-left: 5px solid var(--azul); }
-        footer { text-align: center; padding: 20px; color: #999; font-size: 10px; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h2 { color: var(--azul); text-align: center; margin-top: 0; text-transform: uppercase; }
+        label { display: block; margin: 10px 0 5px; font-size: 12px; font-weight: bold; color: #555; }
+        input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; text-align: center; }
+        button.calc-btn { width: 100%; padding: 15px; background: var(--azul); color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
 <div class="navbar">
-    <button class="nav-btn active" onclick="switchTab('agua', this)">ÁGUA</button>
-    <button class="nav-btn" onclick="switchTab('luz', this)">LUZ</button>
+    <button class="nav-btn active" onclick="switchTab('agua')">ÁGUA</button>
+    <button class="nav-btn" onclick="switchTab('luz')">LUZ</button>
 </div>
 
-<div class="container">
-    
-    <div id="agua" class="secao active">
-        <h2>CONTROLE DE ÁGUA</h2>
-        <div class="card">
-            <label>VALOR TOTAL DA CONTA (R$)</label>
-            <input type="number" id="agua_total_rs" step="0.01">
-            
-            <label>TAXA FIXA (R$)</label>
-            <input type="number" id="agua_taxa" value="82.06" step="0.01">
-            
-            <label>CONSUMO TOTAL DA CONTA (m³)</label>
-            <input type="number" id="agua_total_m3" step="0.1">
-        </div>
+<div id="tab-agua" class="container">
+    <div class="card">
+        <h2>Controle de Água</h2>
+        <label>VALOR TOTAL DA CONTA (R$)</label>
+        <input type="number" id="v-total" step="0.01" placeholder="0,00">
+        <label>TAXA FIXA (R$)</label>
+        <input type="number" id="t-fixa" step="0.01" value="82.06">
+        <label>CONSUMO TOTAL (m³)</label>
+        <input type="number" id="c-total" placeholder="Ex: 60">
+    </div>
+    <div class="card">
+        <label>CASA 2 (Leitura Atual)</label>
+        <input type="number" id="c2-leitura" placeholder="Atual">
+        <label>CASA 3 (Leitura Atual)</label>
+        <input type="number" id="c3-leitura" placeholder="Atual">
+    </div>
+    <button class="calc-btn" onclick="calcularAgua()">CALCULAR ÁGUA</button>
+</div>
 
-        <div class="card">
-            <label>CASA 2 (Atual)</label>
-            <div id="ant_agua_2" class="info-ant">Anterior: 0</div>
-            <input type="number" id="agua_2_at" step="0.1">
+<div id="tab-luz" class="container hidden">
+    <div class="card">
+        <h2>Controle de Luz</h2>
+        <p style="text-align:center; color:#666;">Em desenvolvimento...</p>
+    </div>
+</div>
 
-            <label>CASA 3 (Atual)</label>
-            <div id="ant_agua_3" class="info-ant">Anterior: 0</div>
-            <input type="number" id="agua_3_at" step="0.1">
-        </div>
+<script>
+    function switchTab(tab) {
+        document.getElementById('tab-agua').classList.toggle('hidden', tab !== 'agua');
+        document.getElementById('tab-luz').classList.toggle('hidden', tab !== 'luz');
+        document.querySelectorAll('.nav-btn').forEach((btn, idx) => {
+            btn.classList.toggle('active', (tab === 'agua' && idx === 0) || (tab === 'luz' && idx === 1));
+        });
+    }
 
-        <button class="main-btn btn-calc" onclick="calcularAgua()">CALCULAR ÁGUA</button>
-        <div id="res-agua"></div>
-        <button id="zap-agua" class="main
+    function calcularAgua() {
+        const vTotal = parseFloat(document.getElementById('v-total').value);
+        if(!vTotal) { alert('Coloque o valor da conta!'); return; }
+        alert('Cálculo acionado! Valor: R$ ' + vTotal);
+        // Aqui colocaremos a lógica completa assim que o botão voltar a funcionar
+    }
+</script>
+
+</body>
+</html>
