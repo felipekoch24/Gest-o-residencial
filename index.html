@@ -2,6 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="google" content="notranslate">
     <title>Contas Casa</title>
@@ -17,7 +18,6 @@
         h2 { color: var(--azul); text-align: center; margin: 0 0 15px 0; font-size: 20px; text-transform: uppercase; }
         label { display: block; margin: 12px 0 5px; font-size: 11px; font-weight: bold; color: #666; text-transform: uppercase; }
         input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 18px; text-align: center; background: #fafafa; font-weight: bold; color: #000; }
-        input:focus { border-color: var(--azul); outline: none; background: #fff; }
         button { width: 100%; padding: 16px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.2s; }
         .calc-btn { background: var(--azul); color: white; box-shadow: 0 4px 6px rgba(0,68,136,0.2); }
         .clear-btn { background: none; color: var(--vermelho); border: 1px solid var(--vermelho); margin-top: 20px; font-size: 13px; padding: 10px; opacity: 0.7; }
@@ -131,25 +131,23 @@
 
     function exibir(id, r1, r2, r3) {
         const div = document.getElementById(id);
-        div.innerHTML = `<strong>VALORES A PAGAR:</strong><br>🏠 Casa 1 (Sua): <b>R$ ${r1}</b><br>🏠 Casa 2: <b>R$ ${r2}</b><br>🏠 Casa 3: <b>R$ ${r3}</b>`;
+        div.innerHTML = `<strong>VALORES:</strong><br>🏠 Casa 1: <b>R$ ${r1}</b><br>🏠 Casa 2: <b>R$ ${r2}</b><br>🏠 Casa 3: <b>R$ ${r3}</b>`;
         div.classList.remove('hidden');
     }
 
     function salvar() {
-        const inputs = document.querySelectorAll('input');
-        inputs.forEach(i => localStorage.setItem(i.id, i.value));
+        document.querySelectorAll('input').forEach(i => localStorage.setItem(i.id, i.value));
     }
 
     function limparDados() {
-        if(confirm("Deseja apagar todos os valores salvos?")) {
+        if(confirm("Deseja zerar todos os valores?")) {
             localStorage.clear();
             location.reload();
         }
     }
 
     window.onload = () => {
-        const inputs = document.querySelectorAll('input');
-        inputs.forEach(i => {
+        document.querySelectorAll('input').forEach(i => {
             if(localStorage.getItem(i.id)) i.value = localStorage.getItem(i.id);
         });
     }
