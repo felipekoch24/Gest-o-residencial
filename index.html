@@ -103,7 +103,7 @@
         document.getElementById('res-agua').innerHTML = `
             <div class="recibo"><div class="recibo-header">RECIBO ÁGUA - NANDA</div>Taxa: R$ ${formatar(taxaIndiv)}<br>Gasto (${nandaM3}m³): R$ ${formatar(gNanda)}<br><hr><b>TOTAL: R$ ${formatar(gNanda + taxaIndiv)}</b></div>
             <div class="recibo"><div class="recibo-header">RECIBO ÁGUA - LEIA</div>Taxa: R$ ${formatar(taxaIndiv)}<br>Gasto (${leiaM3}m³): R$ ${formatar(gLeia)}<br><hr><b>TOTAL: R$ ${formatar(gLeia + taxaIndiv)}</b></div>
-            <div class="recibo"><div class="recibo-header">CARLA</div>Taxa: R$ ${formatar(taxaIndiv)}<br>Gasto (${(cTotal-nandaM3-leiaM3).toFixed(0)}m³): R$ ${formatar(gCarla)}<br><hr><b>TOTAL: R$ ${formatar(gCarla + taxaIndiv)}</b></div>
+            <div class="recibo"><div class="recibo-header">RECIBO ÁGUA - CARLA</div>Taxa: R$ ${formatar(taxaIndiv)}<br>Gasto (${(cTotal-nandaM3-leiaM3).toFixed(0)}m³): R$ ${formatar(gCarla)}<br><hr><b>TOTAL: R$ ${formatar(gCarla + taxaIndiv)}</b></div>
         `;
         document.getElementById('res-agua').classList.remove('hidden');
     }
@@ -122,7 +122,7 @@
 
         document.getElementById('res-luz').innerHTML = `
             <div class="recibo"><div class="recibo-header">RECIBO LUZ - NANDA</div>Taxa/Ilum: R$ ${formatar(taxaIndiv)}<br>Gasto (${nandaKwh}KWh): R$ ${formatar(gNanda)}<br><hr><b>TOTAL: R$ ${formatar(gNanda + taxaIndiv)}</b></div>
-            <div class="recibo"><div class="recibo-header">CARLA</div>Taxa/Ilum: R$ ${formatar(taxaIndiv)}<br>Gasto (${(cTotal-nandaKwh).toFixed(0)}KWh): R$ ${formatar(gCarla)}<br><hr><b>TOTAL: R$ ${formatar(gCarla + taxaIndiv)}</b></div>
+            <div class="recibo"><div class="recibo-header">RECIBO LUZ - CARLA</div>Taxa/Ilum: R$ ${formatar(taxaIndiv)}<br>Gasto (${(cTotal-nandaKwh).toFixed(0)}KWh): R$ ${formatar(gCarla)}<br><hr><b>TOTAL: R$ ${formatar(gCarla + taxaIndiv)}</b></div>
         `;
         document.getElementById('res-luz').classList.remove('hidden');
     }
