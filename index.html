@@ -8,7 +8,7 @@
     <title>Gestão Residencial</title>
     <style>
         :root { --azul: #004488; --cinza: #f4f4f9; --dark: #333; --vermelho: #cc0000; }
-        body { font-family: sans-serif; margin: 0; background: var(--cinza); color: var(--dark); padding-bottom: 50px; }
+        body { font-family: sans-serif; margin: 0; background: var(--cinza); color: var(--dark); padding-bottom: 60px; }
         .navbar { display: flex; background: var(--azul); position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .nav-btn { flex: 1; padding: 18px; border: none; background: none; color: white; font-weight: bold; font-size: 16px; cursor: pointer; opacity: 0.5; }
         .nav-btn.active { opacity: 1; border-bottom: 4px solid white; }
@@ -19,13 +19,14 @@
         input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 18px; text-align: center; background: #fafafa; font-weight: bold; color: #000; }
         button { width: 100%; padding: 16px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .calc-btn { background: var(--azul); color: white; box-shadow: 0 4px 6px rgba(0,68,136,0.2); }
-        .clear-btn { background: none; color: var(--vermelho); border: 1px solid var(--vermelho); margin-top: 30px; font-size: 12px; padding: 8px; opacity: 0.6; }
+        .clear-btn { background: none; color: var(--vermelho); border: 1px solid var(--vermelho); margin-top: 30px; font-size: 12px; padding: 8px; opacity: 0.6; width: 100%; }
         .recibo { background: #fff; border: 2px dashed #004488; padding: 20px; border-radius: 10px; margin-top: 20px; line-height: 1.8; font-size: 16px; position: relative; }
-        .recibo b { font-size: 18px; color: #000; }
+        .recibo b { font-size: 20px; color: #000; }
         .recibo-header { border-bottom: 2px solid #004488; margin-bottom: 15px; padding-bottom: 5px; font-weight: bold; color: var(--azul); text-align: center; font-size: 18px; }
         .hidden { display: none; }
         .row { display: flex; gap: 10px; }
         .row div { flex: 1; }
+        hr { border: 0; border-top: 1px solid #ddd; margin: 10px 0; }
     </style>
 </head>
 <body>
@@ -61,8 +62,10 @@
         <h2>Luz</h2>
         <label>Valor Total da Conta (R$)</label>
         <input type="number" id="l-v-total" step="0.01" oninput="salvar()">
-        <label>Total KWh (Geral)</label>
-        <input type="number" id="l-c-total" oninput="salvar()">
+        <div class="row">
+            <div><label>Taxa/Ilum. (R$)</label><input type="number" id="l-t-fixa" step="0.01" value="0.00" oninput="salvar()"></div>
+            <div><label>Total KWh (Geral)</label><input type="number" id="l-c-total" oninput="salvar()"></div>
+        </div>
     </div>
     <div class="card">
         <label>Nanda KWh (Relógio)</label>
@@ -100,25 +103,34 @@
         const totalCarla = (vTotal - totalNanda - totalLeia).toFixed(2);
 
         document.getElementById('res-agua').innerHTML = `
-            <div class="recibo"><div class="recibo-header">RECIBO ÁGUA - NANDA</div>Taxa de Água: R$ ${taxaIndiv}<br>Gasto (${nandaM3}m³): R$ ${gNanda}<br><hr><b>TOTAL: R$ ${totalNanda}</b></div>
-            <div class="recibo"><div class="recibo-header">RECIBO ÁGUA - LEIA</div>Taxa de Água: R$ ${taxaIndiv}<br>Gasto (${leiaM3}m³): R$ ${gLeia}<br><hr><b>TOTAL: R$ ${totalLeia}</b></div>
-            <div class="recibo" style="border: 1px solid #ccc;"><div class="recibo-header" style="color:#666; border-color:#ccc;">CARLA (SOBRA)</div>TOTAL: <b>R$ ${totalCarla}</b></div>
+            <div class="recibo"><div class="recibo-header">RECIBO ÁGUA - NANDA</div>Taxa de Água: R$ ${taxaIndiv}<br>Gasto Consumo: R$ ${gNanda}<br><hr><b>TOTAL: R$ ${totalNanda}</b></div>
+            <div class="recibo"><div class="recibo-header">RECIBO ÁGUA - LEIA</div>Taxa de Água: R$ ${taxaIndiv}<br>Gasto Consumo: R$ ${gLeia}<br><hr><b>TOTAL: R$ ${totalLeia}</b></div>
+            <div class="recibo" style="border: 1px solid #ccc; opacity: 0.8;"><div class="recibo-header" style="color:#666; border-color:#ccc;">CARLA</div>TOTAL: <b>R$ ${totalCarla}</b></div>
         `;
         document.getElementById('res-agua').classList.remove('hidden');
     }
 
     function calcularLuz() {
         const vTotal = parseFloat(document.getElementById('l-v-total').value) || 0;
+        const tFixa = parseFloat(document.getElementById('l-t-fixa').value) || 0; 
         const cTotal = parseFloat(document.getElementById('l-c-total').value) || 1;
         const nandaKwh = parseFloat(document.getElementById('l-nanda').value) || 0;
 
-        const precoKwh = vTotal / cTotal;
-        const valNanda = (nandaKwh * precoKwh).toFixed(2);
-        const valCarla = (vTotal - valNanda).toFixed(2);
+        const precoKwh = (vTotal - tFixa) / cTotal;
+        const taxaIndiv = (tFixa / 2).toFixed(2); // Dividido por 2 (Nanda e Carla)
+        
+        // Cálculo NANDA
+        const gNanda = (nandaKwh * precoKwh).toFixed(2);
+        const totalNanda = (parseFloat(gNanda) + parseFloat(taxaIndiv)).toFixed(2);
+        
+        // Cálculo CARLA (Sobra)
+        const totalCarla = (vTotal - totalNanda).toFixed(2);
+        const gCarla = (parseFloat(totalCarla) - parseFloat(taxaIndiv)).toFixed(2);
+        const kwhCarla = (parseFloat(gCarla) / precoKwh).toFixed(0); // Aproximação do KWh dela
 
         document.getElementById('res-luz').innerHTML = `
-            <div class="recibo"><div class="recibo-header">RECIBO LUZ - NANDA</div>Gasto (${nandaKwh} KWh): R$ ${valNanda}<br><hr><b>TOTAL: R$ ${valNanda}</b></div>
-            <div class="recibo" style="border: 1px solid #ccc;"><div class="recibo-header" style="color:#666; border-color:#ccc;">CARLA (SOBRA)</div>TOTAL: <b>R$ ${valCarla}</b></div>
+            <div class="recibo"><div class="recibo-header">RECIBO LUZ - NANDA</div>Taxa/Ilum: R$ ${taxaIndiv}<br>Gasto (${nandaKwh} KWh): R$ ${gNanda}<br><hr><b>TOTAL: R$ ${totalNanda}</b></div>
+            <div class="recibo" style="border: 1px solid #ccc; opacity: 0.8;"><div class="recibo-header" style="color:#666; border-color:#ccc;">CARLA</div>Taxa/Ilum: R$ ${taxaIndiv}<br>Gasto (${kwhCarla} KWh): R$ ${gCarla}<br><hr><b>TOTAL: R$ ${totalCarla}</b></div>
         `;
         document.getElementById('res-luz').classList.remove('hidden');
     }
@@ -129,4 +141,3 @@
 </script>
 </body>
 </html>
-
