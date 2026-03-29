@@ -6,69 +6,153 @@
     <meta name="google" content="notranslate">
     <title>Contas Casa</title>
     <style>
-        :root { --azul: #004488; --cinza: #f4f4f9; }
-        body { font-family: sans-serif; margin: 0; background: var(--cinza); user-select: none; }
-        .navbar { display: flex; background: var(--azul); position: sticky; top: 0; z-index: 100; }
-        .nav-btn { flex: 1; padding: 15px; border: none; background: none; color: white; font-weight: bold; font-size: 16px; cursor: pointer; opacity: 0.6; }
+        :root { --azul: #004488; --cinza: #f4f4f9; --dark: #333; --vermelho: #cc0000; }
+        body { font-family: sans-serif; margin: 0; background: var(--cinza); color: var(--dark); }
+        .navbar { display: flex; background: var(--azul); position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .nav-btn { flex: 1; padding: 18px; border: none; background: none; color: white; font-weight: bold; font-size: 16px; cursor: pointer; opacity: 0.5; transition: 0.3s; }
         .nav-btn.active { opacity: 1; border-bottom: 4px solid white; }
-        .container { padding: 20px; max-width: 500px; margin: auto; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        h2 { color: var(--azul); text-align: center; margin-top: 0; text-transform: uppercase; }
-        label { display: block; margin: 10px 0 5px; font-size: 12px; font-weight: bold; color: #555; }
-        input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; text-align: center; }
-        button.calc-btn { width: 100%; padding: 15px; background: var(--azul); color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        .container { padding: 15px; max-width: 500px; margin: auto; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .card { background: white; padding: 18px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 15px; }
+        h2 { color: var(--azul); text-align: center; margin: 0 0 15px 0; font-size: 20px; text-transform: uppercase; }
+        label { display: block; margin: 12px 0 5px; font-size: 11px; font-weight: bold; color: #666; text-transform: uppercase; }
+        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 18px; text-align: center; background: #fafafa; font-weight: bold; color: #000; }
+        input:focus { border-color: var(--azul); outline: none; background: #fff; }
+        button { width: 100%; padding: 16px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.2s; }
+        .calc-btn { background: var(--azul); color: white; box-shadow: 0 4px 6px rgba(0,68,136,0.2); }
+        .clear-btn { background: none; color: var(--vermelho); border: 1px solid var(--vermelho); margin-top: 20px; font-size: 13px; padding: 10px; opacity: 0.7; }
+        .result-box { background: #eef7ff; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 5px solid var(--azul); line-height: 1.6; }
         .hidden { display: none; }
+        .row { display: flex; gap: 10px; }
+        .row div { flex: 1; }
     </style>
 </head>
 <body>
 
 <div class="navbar">
-    <button class="nav-btn active" onclick="switchTab('agua')">ÁGUA</button>
-    <button class="nav-btn" onclick="switchTab('luz')">LUZ</button>
+    <button id="btn-agua" class="nav-btn active" onclick="switchTab('agua')">ÁGUA</button>
+    <button id="btn-luz" class="nav-btn" onclick="switchTab('luz')">LUZ</button>
 </div>
 
 <div id="tab-agua" class="container">
     <div class="card">
-        <h2>Controle de Água</h2>
-        <label>VALOR TOTAL DA CONTA (R$)</label>
-        <input type="number" id="v-total" step="0.01" placeholder="0,00">
-        <label>TAXA FIXA (R$)</label>
-        <input type="number" id="t-fixa" step="0.01" value="82.06">
-        <label>CONSUMO TOTAL (m³)</label>
-        <input type="number" id="c-total" placeholder="Ex: 60">
+        <h2>Água</h2>
+        <label>Valor Total da Conta (R$)</label>
+        <input type="number" id="a-v-total" step="0.01" oninput="salvar()">
+        <div class="row">
+            <div>
+                <label>Taxa Fixa (R$)</label>
+                <input type="number" id="a-t-fixa" step="0.01" value="82.06" oninput="salvar()">
+            </div>
+            <div>
+                <label>Consumo Total (m³)</label>
+                <input type="number" id="a-c-total" oninput="salvar()">
+            </div>
+        </div>
     </div>
     <div class="card">
-        <label>CASA 2 (Leitura Atual)</label>
-        <input type="number" id="c2-leitura" placeholder="Atual">
-        <label>CASA 3 (Leitura Atual)</label>
-        <input type="number" id="c3-leitura" placeholder="Atual">
+        <div class="row">
+            <div>
+                <label>Casa 2 (m³)</label>
+                <input type="number" id="a-c2" oninput="salvar()">
+            </div>
+            <div>
+                <label>Casa 3 (m³)</label>
+                <input type="number" id="a-c3" oninput="salvar()">
+            </div>
+        </div>
     </div>
     <button class="calc-btn" onclick="calcularAgua()">CALCULAR ÁGUA</button>
+    <div id="res-agua" class="result-box hidden"></div>
+    <button class="clear-btn" onclick="limparDados()">🗑️ LIMPAR TODOS OS DADOS</button>
 </div>
 
 <div id="tab-luz" class="container hidden">
     <div class="card">
-        <h2>Controle de Luz</h2>
-        <p style="text-align:center; color:#666;">Em desenvolvimento...</p>
+        <h2>Luz</h2>
+        <label>Valor Total da Conta (R$)</label>
+        <input type="number" id="l-v-total" step="0.01" oninput="salvar()">
+        <label>Consumo Total (KWh)</label>
+        <input type="number" id="l-c-total" oninput="salvar()">
     </div>
+    <div class="card">
+        <div class="row">
+            <div>
+                <label>Casa 2 (KWh)</label>
+                <input type="number" id="l-c2" oninput="salvar()">
+            </div>
+            <div>
+                <label>Casa 3 (KWh)</label>
+                <input type="number" id="l-c3" oninput="salvar()">
+            </div>
+        </div>
+    </div>
+    <button class="calc-btn" onclick="calcularLuz()">CALCULAR LUZ</button>
+    <div id="res-luz" class="result-box hidden"></div>
+    <button class="clear-btn" onclick="limparDados()">🗑️ LIMPAR TODOS OS DADOS</button>
 </div>
 
 <script>
     function switchTab(tab) {
         document.getElementById('tab-agua').classList.toggle('hidden', tab !== 'agua');
         document.getElementById('tab-luz').classList.toggle('hidden', tab !== 'luz');
-        document.querySelectorAll('.nav-btn').forEach((btn, idx) => {
-            btn.classList.toggle('active', (tab === 'agua' && idx === 0) || (tab === 'luz' && idx === 1));
-        });
+        document.getElementById('btn-agua').classList.toggle('active', tab === 'agua');
+        document.getElementById('btn-luz').classList.toggle('active', tab === 'luz');
     }
 
     function calcularAgua() {
-        const vTotal = parseFloat(document.getElementById('v-total').value);
-        if(!vTotal) { alert('Coloque o valor da conta!'); return; }
-        alert('Cálculo acionado! Valor: R$ ' + vTotal);
-        // Aqui colocaremos a lógica completa assim que o botão voltar a funcionar
+        const vTotal = parseFloat(document.getElementById('a-v-total').value) || 0;
+        const tFixa = parseFloat(document.getElementById('a-t-fixa').value) || 0;
+        const cTotal = parseFloat(document.getElementById('a-c-total').value) || 1;
+        const c2 = parseFloat(document.getElementById('a-c2').value) || 0;
+        const c3 = parseFloat(document.getElementById('a-c3').value) || 0;
+
+        const precoM3 = (vTotal - tFixa) / cTotal;
+        const res2 = (c2 * precoM3).toFixed(2);
+        const res3 = (c3 * precoM3).toFixed(2);
+        const res1 = (vTotal - res2 - res3).toFixed(2);
+
+        exibir('res-agua', res1, res2, res3);
+    }
+
+    function calcularLuz() {
+        const vTotal = parseFloat(document.getElementById('l-v-total').value) || 0;
+        const cTotal = parseFloat(document.getElementById('l-c-total').value) || 1;
+        const c2 = parseFloat(document.getElementById('l-c2').value) || 0;
+        const c3 = parseFloat(document.getElementById('l-c3').value) || 0;
+
+        const precoKwh = vTotal / cTotal;
+        const res2 = (c2 * precoKwh).toFixed(2);
+        const res3 = (c3 * precoKwh).toFixed(2);
+        const res1 = (vTotal - res2 - res3).toFixed(2);
+
+        exibir('res-luz', res1, res2, res3);
+    }
+
+    function exibir(id, r1, r2, r3) {
+        const div = document.getElementById(id);
+        div.innerHTML = `<strong>VALORES A PAGAR:</strong><br>🏠 Casa 1 (Sua): <b>R$ ${r1}</b><br>🏠 Casa 2: <b>R$ ${r2}</b><br>🏠 Casa 3: <b>R$ ${r3}</b>`;
+        div.classList.remove('hidden');
+    }
+
+    function salvar() {
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(i => localStorage.setItem(i.id, i.value));
+    }
+
+    function limparDados() {
+        if(confirm("Deseja apagar todos os valores salvos?")) {
+            localStorage.clear();
+            location.reload();
+        }
+    }
+
+    window.onload = () => {
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(i => {
+            if(localStorage.getItem(i.id)) i.value = localStorage.getItem(i.id);
+        });
     }
 </script>
-
 </body>
 </html>
