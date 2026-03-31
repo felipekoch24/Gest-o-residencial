@@ -2,134 +2,142 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gestão Residencial</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONTAS DO PAI</title>
     <style>
-        :root { --azul: #004488; --cinza: #f4f4f9; --dark: #333; --vermelho: #cc0000; }
-        body { font-family: sans-serif; margin: 0; background: var(--cinza); color: var(--dark); padding-bottom: 60px; }
-        .navbar { display: flex; background: var(--azul); position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .nav-btn { flex: 1; padding: 18px; border: none; background: none; color: white; font-weight: bold; font-size: 16px; cursor: pointer; opacity: 0.5; }
-        .nav-btn.active { opacity: 1; border-bottom: 4px solid white; }
-        .container { padding: 15px; max-width: 500px; margin: auto; }
-        .card { background: white; padding: 18px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 15px; }
-        h2 { color: var(--azul); text-align: center; margin: 0 0 15px 0; font-size: 18px; text-transform: uppercase; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        label { display: block; margin: 12px 0 5px; font-size: 11px; font-weight: bold; color: #666; text-transform: uppercase; }
-        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 18px; text-align: center; background: #fafafa; font-weight: bold; color: #000; }
-        button { width: 100%; padding: 16px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .calc-btn { background: var(--azul); color: white; }
-        .clear-btn { background: none; color: var(--vermelho); border: 1px solid var(--vermelho); margin-top: 30px; font-size: 12px; padding: 8px; width: 100%; }
-        .recibo { background: #fff; border: 2px dashed #004488; padding: 20px; border-radius: 10px; margin-top: 20px; line-height: 1.8; font-size: 16px; }
-        .recibo b { font-size: 20px; color: #000; }
-        .recibo-header { border-bottom: 2px solid #004488; margin-bottom: 15px; padding-bottom: 5px; font-weight: bold; color: var(--azul); text-align: center; font-size: 18px; }
-        .hidden { display: none; }
-        .row { display: flex; gap: 10px; }
-        .row div { flex: 1; }
-        hr { border: 0; border-top: 1px solid #ddd; margin: 10px 0; }
+        body { font-family: sans-serif; background-color: #f0f2f5; margin: 0; padding: 10px; color: #000; }
+        .abas { display: flex; gap: 8px; margin-bottom: 10px; }
+        .aba-btn { flex: 1; padding: 20px; border: none; border-radius: 10px; font-weight: 900; font-size: 18px; cursor: pointer; background: #ccc; text-transform: uppercase; }
+        .aba-btn.active { background: #004488; color: white; }
+
+        .secao { display: none; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .secao.active { display: block; }
+
+        label { display: block; font-weight: bold; font-size: 13px; margin-top: 12px; color: #444; text-transform: uppercase; }
+        input { width: 100%; padding: 15px; font-size: 22px; font-weight: bold; text-align: center; border: 2px solid #bbb; border-radius: 8px; box-sizing: border-box; margin-bottom: 5px; }
+        
+        .btn-gerar { width: 100%; padding: 22px; background: #28a745; color: white; border: none; border-radius: 10px; font-size: 20px; font-weight: 900; cursor: pointer; margin-top: 15px; }
+
+        /* Estilo do Recibo para o Pai */
+        #recibo { 
+            margin-top: 20px; padding: 20px; background: #fff; border: 4px solid #000; 
+            border-radius: 10px; display: none; text-align: left; 
+            font-family: Arial, sans-serif; font-size: 18px; line-height: 1.5;
+        }
+        .data-header { color: #cc0000; font-weight: 900; border-bottom: 3px solid #000; margin-bottom: 15px; text-align: center; display: block; font-size: 22px; }
+        .bloco { border-bottom: 2px solid #333; padding: 15px 0; }
+        .destaque { font-size: 24px; font-weight: 900; background: #eee; padding: 2px 5px; }
+        footer { text-align: center; margin-top: 20px; font-weight: bold; color: #aaa; font-size: 10px; }
     </style>
 </head>
 <body>
 
-<div class="navbar">
-    <button id="btn-agua" class="nav-btn active" onclick="switchTab('agua')">ÁGUA</button>
-    <button id="btn-luz" class="nav-btn" onclick="switchTab('luz')">LUZ</button>
+<div class="abas">
+    <button class="aba-btn active" onclick="tab(this, 'agua')">💧 ÁGUA</button>
+    <button class="aba-btn" onclick="tab(this, 'luz')">⚡ LUZ</button>
 </div>
 
-<div id="tab-agua" class="container">
-    <div class="card">
-        <h2>Água</h2>
-        <label>Valor Total da Conta (R$)</label>
-        <input type="number" id="a-v-total" step="0.01" oninput="salvar()">
-        <div class="row">
-            <div><label>Taxa Fixa (R$)</label><input type="number" id="a-t-fixa" step="0.01" value="82.06" oninput="salvar()"></div>
-            <div><label>Total m³ (Geral)</label><input type="number" id="a-c-total" oninput="salvar()"></div>
-        </div>
-    </div>
-    <div class="card">
-        <div class="row">
-            <div><label>Nanda m³</label><input type="number" id="a-nanda" oninput="salvar()"></div>
-            <div><label>Leia m³</label><input type="number" id="a-leia" oninput="salvar()"></div>
-        </div>
-    </div>
-    <button class="calc-btn" onclick="calcularAgua()">GERAR RECIBOS ÁGUA</button>
-    <div id="res-agua" class="hidden"></div>
-    <button class="clear-btn" onclick="limparDados()">🗑️ RESETAR VALORES</button>
+<div id="agua" class="secao active">
+    <label>VALOR TOTAL DA CONTA (R$)</label>
+    <input type="text" id="a-total" placeholder="R$ 0,00" oninput="money(this)">
+    <label>CONSUMO NANDA FILHA (m³)</label>
+    <input type="number" id="a-nanda-c" step="0.1">
+    <label>CONSUMO LEIA (m³)</label>
+    <input type="number" id="a-leia-c" step="0.1">
+    <label>CONSUMO TOTAL DA CONTA (m³)</label>
+    <input type="number" id="a-total-m3" step="0.1">
+    <label>TAXA FIXA ÁGUA (R$)</label>
+    <input type="text" id="a-taxa" value="R$ 82,06" oninput="money(this)">
+    <button class="btn-gerar" onclick="calcAgua()">GERAR RECIBO ÁGUA</button>
 </div>
 
-<div id="tab-luz" class="container hidden">
-    <div class="card">
-        <h2>Luz</h2>
-        <label>Valor Total da Conta (R$)</label>
-        <input type="number" id="l-v-total" step="0.01" oninput="salvar()">
-        <div class="row">
-            <div><label>Taxa/Ilum. (R$)</label><input type="number" id="l-t-fixa" step="0.01" value="0.00" oninput="salvar()"></div>
-            <div><label>Total KWh (Geral)</label><input type="number" id="l-c-total" oninput="salvar()"></div>
-        </div>
-    </div>
-    <div class="card">
-        <label>Nanda KWh (Relógio)</label>
-        <input type="number" id="l-nanda" oninput="salvar()">
-    </div>
-    <button class="calc-btn" onclick="calcularLuz()">GERAR RECIBOS LUZ</button>
-    <div id="res-luz" class="hidden"></div>
-    <button class="clear-btn" onclick="limparDados()">🗑️ RESETAR VALORES</button>
+<div id="luz" class="secao">
+    <label>VALOR TOTAL DA CONTA (R$)</label>
+    <input type="text" id="l-total" placeholder="R$ 0,00" oninput="money(this)">
+    <label>CONSUMO NANDA FILHA (kWh)</label>
+    <input type="number" id="l-nanda-c">
+    <label>CONSUMO TOTAL DA CONTA (kWh)</label>
+    <input type="number" id="l-total-kw">
+    <label>TAXA DE LUZ (R$)</label>
+    <input type="text" id="l-taxa" oninput="money(this)">
+    <button class="btn-gerar" onclick="calcLuz()">GERAR RECIBO LUZ</button>
 </div>
+
+<div id="recibo"></div>
+<footer>SISTEMA DE GESTÃO - FELIPE</footer>
 
 <script>
-    function switchTab(tab) {
-        document.getElementById('tab-agua').classList.toggle('hidden', tab !== 'agua');
-        document.getElementById('tab-luz').classList.toggle('hidden', tab !== 'luz');
-        document.getElementById('btn-agua').classList.toggle('active', tab === 'agua');
-        document.getElementById('btn-luz').classList.toggle('active', tab === 'luz');
-        window.scrollTo(0,0);
+    function tab(btn, id) {
+        document.querySelectorAll('.secao').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.aba-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        btn.classList.add('active');
+        document.getElementById('recibo').style.display = 'none';
     }
 
-    function formatar(valor) { return parseFloat(valor).toFixed(2); }
-
-    function calcularAgua() {
-        const vTotal = parseFloat(document.getElementById('a-v-total').value) || 0;
-        const tFixa = parseFloat(document.getElementById('a-t-fixa').value) || 0;
-        const cTotal = parseFloat(document.getElementById('a-c-total').value) || 1;
-        const nandaM3 = parseFloat(document.getElementById('a-nanda').value) || 0;
-        const leiaM3 = parseFloat(document.getElementById('a-leia').value) || 0;
-
-        const precoM3 = (vTotal - tFixa) / cTotal;
-        const taxaIndiv = tFixa / 3;
-        
-        const gNanda = nandaM3 * precoM3;
-        const gLeia = leiaM3 * precoM3;
-        const gCarla = (cTotal - nandaM3 - leiaM3) * precoM3;
-
-        document.getElementById('res-agua').innerHTML = `
-            <div class="recibo"><div class="recibo-header">RECIBO ÁGUA - NANDA</div>Taxa: R$ ${formatar(taxaIndiv)}<br>Gasto (${nandaM3}m³): R$ ${formatar(gNanda)}<br><hr><b>TOTAL: R$ ${formatar(gNanda + taxaIndiv)}</b></div>
-            <div class="recibo"><div class="recibo-header">RECIBO ÁGUA - LEIA</div>Taxa: R$ ${formatar(taxaIndiv)}<br>Gasto (${leiaM3}m³): R$ ${formatar(gLeia)}<br><hr><b>TOTAL: R$ ${formatar(gLeia + taxaIndiv)}</b></div>
-            <div class="recibo"><div class="recibo-header">RECIBO ÁGUA - CARLA</div>Taxa: R$ ${formatar(taxaIndiv)}<br>Gasto (${(cTotal-nandaM3-leiaM3).toFixed(0)}m³): R$ ${formatar(gCarla)}<br><hr><b>TOTAL: R$ ${formatar(gCarla + taxaIndiv)}</b></div>
-        `;
-        document.getElementById('res-agua').classList.remove('hidden');
+    function money(i) {
+        let v = i.value.replace(/\D/g, "");
+        v = (v / 100).toFixed(2).replace(".", ",");
+        v = v.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+        i.value = "R$ " + v;
     }
 
-    function calcularLuz() {
-        const vTotal = parseFloat(document.getElementById('l-v-total').value) || 0;
-        const tFixa = parseFloat(document.getElementById('l-t-fixa').value) || 0;
-        const cTotal = parseFloat(document.getElementById('l-c-total').value) || 1;
-        const nandaKwh = parseFloat(document.getElementById('l-nanda').value) || 0;
+    function toNum(v) { return parseFloat(v.replace(/[^\d,]/g, '').replace(',', '.')) || 0; }
+    function toReal(n) { return n.toLocaleString('pt-br', {style: 'currency', currency: 'BRL'}); }
 
-        const precoKwh = (vTotal - tFixa) / cTotal;
-        const taxaIndiv = tFixa / 2;
-        
-        const gNanda = nandaKwh * precoKwh;
-        const gCarla = (cTotal - nandaKwh) * precoKwh;
-
-        document.getElementById('res-luz').innerHTML = `
-            <div class="recibo"><div class="recibo-header">RECIBO LUZ - NANDA</div>Taxa/Ilum: R$ ${formatar(taxaIndiv)}<br>Gasto (${nandaKwh}KWh): R$ ${formatar(gNanda)}<br><hr><b>TOTAL: R$ ${formatar(gNanda + taxaIndiv)}</b></div>
-            <div class="recibo"><div class="recibo-header">RECIBO LUZ - CARLA</div>Taxa/Ilum: R$ ${formatar(taxaIndiv)}<br>Gasto (${(cTotal-nandaKwh).toFixed(0)}KWh): R$ ${formatar(gCarla)}<br><hr><b>TOTAL: R$ ${formatar(gCarla + taxaIndiv)}</b></div>
-        `;
-        document.getElementById('res-luz').classList.remove('hidden');
+    function getD() {
+        const d = new Date();
+        const m = ["JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO", "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"];
+        return `${d.getDate()} DE ${m[d.getMonth()]}`;
     }
 
-    function salvar() { document.querySelectorAll('input').forEach(i => localStorage.setItem(i.id, i.value)); }
-    function limparDados() { if(confirm("Zerar todos os valores?")) { localStorage.clear(); location.reload(); } }
-    window.onload = () => { document.querySelectorAll('input').forEach(i => { if(localStorage.getItem(i.id)) i.value = localStorage.getItem(i.id); }); }
+    function htmlBloco(nome, totalC, taxa, consumoVal, m3kw, totalInd, unidade) {
+        return `
+            <div class="bloco">
+                <b style="font-size: 22px;">${nome}:</b><br>
+                TOTAL CONTA: <b>${toReal(totalC)}</b><br>
+                TAXA: <b>${toReal(taxa)}</b><br>
+                CONSUMO: ${m3kw} ${unidade} (<b>${toReal(consumoVal)}</b>)<br>
+                TOTAL A PAGAR: <span class="destaque">${toReal(totalInd)}</span>
+            </div>`;
+    }
+
+    function calcAgua() {
+        const totalRs = toNum(document.getElementById('a-total').value);
+        const taxaT = toNum(document.getElementById('a-taxa').value);
+        const m3T = parseFloat(document.getElementById('a-total-m3').value) || 1;
+        const nandaM3 = parseFloat(document.getElementById('a-nanda-c').value) || 0;
+        const leiaM3 = parseFloat(document.getElementById('a-leia-c').value) || 0;
+        const carlaM3 = m3T - nandaM3 - leiaM3;
+        const preco = (totalRs - taxaT) / m3T;
+        const taxaP = taxaT / 3;
+
+        const r = document.getElementById('recibo');
+        r.innerHTML = `<span class="data-header">DATA: ${getD()}</span>
+            <center><b style="font-size: 20px;">DEMONSTRATIVO DE ÁGUA</b></center>
+            ${htmlBloco('NANDA FILHA', totalRs, taxaP, nandaM3 * preco, nandaM3, (nandaM3 * preco) + taxaP, 'm³')}
+            ${htmlBloco('LEIA', totalRs, taxaP, leiaM3 * preco, leiaM3, (leiaM3 * preco) + taxaP, 'm³')}
+            ${htmlBloco('CARLA', totalRs, taxaP, carlaM3 * preco, carlaM3.toFixed(1), (carlaM3 * preco) + taxaP, 'm³')}`;
+        r.style.display = 'block';
+    }
+
+    function calcLuz() {
+        const totalRs = toNum(document.getElementById('l-total').value);
+        const taxaT = toNum(document.getElementById('l-taxa').value);
+        const kwT = parseFloat(document.getElementById('l-total-kw').value) || 1;
+        const nandaKw = parseFloat(document.getElementById('l-nanda-c').value) || 0;
+        const carlaKw = kwT - nandaKw;
+        const preco = (totalRs - taxaT) / kwT;
+        const taxaP = taxaT / 2;
+
+        const r = document.getElementById('recibo');
+        r.innerHTML = `<span class="data-header">DATA: ${getD()}</span>
+            <center><b style="font-size: 20px;">DEMONSTRATIVO DE LUZ</b></center>
+            ${htmlBloco('NANDA FILHA', totalRs, taxaP, nandaKw * preco, nandaKw, (nandaKw * preco) + taxaP, 'kWh')}
+            ${htmlBloco('CARLA', totalRs, taxaP, carlaKw * preco, carlaKw, (carlaKw * preco) + taxaP, 'kWh')}`;
+        r.style.display = 'block';
+    }
 </script>
+
 </body>
 </html>
