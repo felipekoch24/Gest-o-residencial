@@ -19,6 +19,9 @@
         
         .btn-gerar { width: 100%; padding: 20px; background: #28a745; color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: 900; cursor: pointer; margin-top: 15px; }
         
+        .area-reset { margin-top: 20px; padding: 10px; background: #fff5f5; border: 1px dashed #ff0000; border-radius: 8px; text-align: center; }
+        .btn-reset { background: #666; color: white; border: none; padding: 10px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 12px; }
+
         #recibo { margin-top: 20px; padding: 15px; background: #fff; border: 3px solid #000; border-radius: 10px; display: none; text-align: left; font-size: 17px; }
         .data-header { color: #cc0000; font-weight: 900; border-bottom: 2px solid #000; margin-bottom: 10px; text-align: center; display: block; font-size: 22px; }
         
@@ -50,6 +53,11 @@
     <label>LEITURA LEIA (m³)</label>
     <div class="grid-leitura"><input type="number" id="a-leia-ant" placeholder="Ant."><input type="number" id="a-leia-atu" placeholder="Atu."></div>
     <button class="btn-gerar" onclick="calcAgua()">GERAR RECIBO ÁGUA</button>
+    
+    <div class="area-reset">
+        <span style="color:red; font-size:10px; font-weight:bold; display:block; margin-bottom:5px;">LIMPAR MEMÓRIA DA ÁGUA</span>
+        <button class="btn-reset" onclick="resetA()">APAGAR TUDO DA ÁGUA</button>
+    </div>
 </div>
 
 <div id="luz" class="secao">
@@ -62,6 +70,11 @@
     <label>LEITURA FERNANDA (kWh)</label>
     <div class="grid-leitura"><input type="number" id="l-nanda-ant" placeholder="Ant."><input type="number" id="l-nanda-atu" placeholder="Atu."></div>
     <button class="btn-gerar" onclick="calcLuz()">GERAR RECIBO LUZ</button>
+
+    <div class="area-reset">
+        <span style="color:red; font-size:10px; font-weight:bold; display:block; margin-bottom:5px;">LIMPAR MEMÓRIA DA LUZ</span>
+        <button class="btn-reset" onclick="resetL()">APAGAR TUDO DA LUZ</button>
+    </div>
 </div>
 
 <div id="resumo" class="secao">
@@ -76,12 +89,34 @@
     const getD = () => new Date().toLocaleDateString('pt-br');
 
     window.onload = () => {
+        carregarDados();
+    };
+
+    function carregarDados() {
         document.getElementById('a-total-ant').value = localStorage.getItem('a-total-atu') || '';
         document.getElementById('a-nanda-ant').value = localStorage.getItem('a-nanda-atu') || '';
         document.getElementById('a-leia-ant').value = localStorage.getItem('a-leia-atu') || '';
         document.getElementById('l-total-ant').value = localStorage.getItem('l-total-atu') || '';
         document.getElementById('l-nanda-ant').value = localStorage.getItem('l-nanda-atu') || '';
-    };
+    }
+
+    function resetA() {
+        if(confirm("Deseja apagar os valores salvos de Água?")) {
+            ['a-total-atu', 'a-nanda-atu', 'a-leia-atu'].forEach(k => localStorage.removeItem(k));
+            document.querySelectorAll('#agua input').forEach(i => i.value = i.id === 'a-taxa' ? 'R$ 82,06' : '');
+            dAgua = null;
+            document.getElementById('recibo').style.display = 'none';
+        }
+    }
+
+    function resetL() {
+        if(confirm("Deseja apagar os valores salvos de Luz?")) {
+            ['l-total-atu', 'l-nanda-atu'].forEach(k => localStorage.removeItem(k));
+            document.querySelectorAll('#luz input').forEach(i => i.value = '');
+            dLuz = null;
+            document.getElementById('recibo').style.display = 'none';
+        }
+    }
 
     function money(i) {
         let v = i.value.replace(/\D/g, "");
