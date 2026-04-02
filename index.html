@@ -3,30 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CONTAS DO PAI</title>
+    <title>SISTEMA DE GESTÃO - PAI</title>
     <style>
         body { font-family: sans-serif; background-color: #f0f2f5; margin: 0; padding: 10px; color: #000; }
-        .abas { display: flex; gap: 8px; margin-bottom: 10px; }
-        .aba-btn { flex: 1; padding: 20px; border: none; border-radius: 10px; font-weight: 900; font-size: 18px; cursor: pointer; background: #ccc; text-transform: uppercase; }
+        .abas { display: flex; gap: 5px; margin-bottom: 10px; }
+        .aba-btn { flex: 1; padding: 15px 5px; border: none; border-radius: 8px; font-weight: 900; font-size: 13px; cursor: pointer; background: #ccc; text-transform: uppercase; }
         .aba-btn.active { background: #004488; color: white; }
 
-        .secao { display: none; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .secao { display: none; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 10px; }
         .secao.active { display: block; }
 
-        label { display: block; font-weight: bold; font-size: 13px; margin-top: 12px; color: #444; text-transform: uppercase; }
-        input { width: 100%; padding: 15px; font-size: 22px; font-weight: bold; text-align: center; border: 2px solid #bbb; border-radius: 8px; box-sizing: border-box; margin-bottom: 5px; }
+        .grid-leitura { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        label { display: block; font-weight: bold; font-size: 11px; margin-top: 8px; color: #444; text-transform: uppercase; }
+        input { width: 100%; padding: 12px; font-size: 18px; font-weight: bold; text-align: center; border: 2px solid #bbb; border-radius: 8px; box-sizing: border-box; }
         
-        .btn-gerar { width: 100%; padding: 22px; background: #28a745; color: white; border: none; border-radius: 10px; font-size: 20px; font-weight: 900; cursor: pointer; margin-top: 15px; }
-
-        /* Estilo do Recibo para o Pai */
-        #recibo { 
-            margin-top: 20px; padding: 20px; background: #fff; border: 4px solid #000; 
-            border-radius: 10px; display: none; text-align: left; 
-            font-family: Arial, sans-serif; font-size: 18px; line-height: 1.5;
-        }
-        .data-header { color: #cc0000; font-weight: 900; border-bottom: 3px solid #000; margin-bottom: 15px; text-align: center; display: block; font-size: 22px; }
-        .bloco { border-bottom: 2px solid #333; padding: 15px 0; }
-        .destaque { font-size: 24px; font-weight: 900; background: #eee; padding: 2px 5px; }
+        .btn-gerar { width: 100%; padding: 20px; background: #28a745; color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: 900; cursor: pointer; margin-top: 15px; }
+        
+        #recibo { margin-top: 20px; padding: 15px; background: #fff; border: 3px solid #000; border-radius: 10px; display: none; text-align: left; font-size: 17px; }
+        .data-header { color: #cc0000; font-weight: 900; border-bottom: 2px solid #000; margin-bottom: 10px; text-align: center; display: block; font-size: 22px; }
+        
+        .bloco { border-bottom: 2px solid #eee; padding: 15px 0; }
+        .destaque-agua { background: #e3f2fd; padding: 12px; border-left: 6px solid #2196f3; margin: 10px 0; line-height: 1.6; border-radius: 0 8px 8px 0; }
+        .destaque-luz { background: #fffde7; padding: 12px; border-left: 6px solid #fbc02d; margin: 10px 0; line-height: 1.6; border-radius: 0 8px 8px 0; }
+        .destaque-total { font-size: 26px; font-weight: 900; background: #ffff00; padding: 4px 12px; border: 2px solid #000; display: inline-block; margin-top: 8px; }
+        
         footer { text-align: center; margin-top: 20px; font-weight: bold; color: #aaa; font-size: 10px; }
     </style>
 </head>
@@ -35,45 +35,53 @@
 <div class="abas">
     <button class="aba-btn active" onclick="tab(this, 'agua')">💧 ÁGUA</button>
     <button class="aba-btn" onclick="tab(this, 'luz')">⚡ LUZ</button>
+    <button class="aba-btn" onclick="tab(this, 'resumo')">📋 RESUMO</button>
 </div>
 
 <div id="agua" class="secao active">
-    <label>VALOR TOTAL DA CONTA (R$)</label>
+    <label>VALOR TOTAL CONTA (R$)</label>
     <input type="text" id="a-total" placeholder="R$ 0,00" oninput="money(this)">
-    <label>CONSUMO NANDA FILHA (m³)</label>
-    <input type="number" id="a-nanda-c" step="0.1">
-    <label>CONSUMO LEIA (m³)</label>
-    <input type="number" id="a-leia-c" step="0.1">
-    <label>CONSUMO TOTAL DA CONTA (m³)</label>
-    <input type="number" id="a-total-m3" step="0.1">
-    <label>TAXA FIXA ÁGUA (R$)</label>
+    <label>TAXA FIXA TOTAL (R$)</label>
     <input type="text" id="a-taxa" value="R$ 82,06" oninput="money(this)">
+    <label>LEITURA TOTAL CONTA (m³)</label>
+    <div class="grid-leitura"><input type="number" id="a-total-ant" placeholder="Ant."><input type="number" id="a-total-atu" placeholder="Atu."></div>
+    <label>LEITURA FERNANDA (m³)</label>
+    <div class="grid-leitura"><input type="number" id="a-nanda-ant" placeholder="Ant."><input type="number" id="a-nanda-atu" placeholder="Atu."></div>
+    <label>LEITURA LEIA (m³)</label>
+    <div class="grid-leitura"><input type="number" id="a-leia-ant" placeholder="Ant."><input type="number" id="a-leia-atu" placeholder="Atu."></div>
     <button class="btn-gerar" onclick="calcAgua()">GERAR RECIBO ÁGUA</button>
 </div>
 
 <div id="luz" class="secao">
-    <label>VALOR TOTAL DA CONTA (R$)</label>
+    <label>VALOR TOTAL CONTA (R$)</label>
     <input type="text" id="l-total" placeholder="R$ 0,00" oninput="money(this)">
-    <label>CONSUMO NANDA FILHA (kWh)</label>
-    <input type="number" id="l-nanda-c">
-    <label>CONSUMO TOTAL DA CONTA (kWh)</label>
-    <input type="number" id="l-total-kw">
-    <label>TAXA DE LUZ (R$)</label>
+    <label>TAXA/ILUM. TOTAL (R$)</label>
     <input type="text" id="l-taxa" oninput="money(this)">
+    <label>LEITURA TOTAL CONTA (kWh)</label>
+    <div class="grid-leitura"><input type="number" id="l-total-ant" placeholder="Ant."><input type="number" id="l-total-atu" placeholder="Atu."></div>
+    <label>LEITURA FERNANDA (kWh)</label>
+    <div class="grid-leitura"><input type="number" id="l-nanda-ant" placeholder="Ant."><input type="number" id="l-nanda-atu" placeholder="Atu."></div>
     <button class="btn-gerar" onclick="calcLuz()">GERAR RECIBO LUZ</button>
+</div>
+
+<div id="resumo" class="secao">
+    <button class="btn-gerar" style="background: #004488;" onclick="gerarResumo()">GERAR RESUMO COMPLETO</button>
 </div>
 
 <div id="recibo"></div>
 <footer>SISTEMA DE GESTÃO - FELIPE</footer>
 
 <script>
-    function tab(btn, id) {
-        document.querySelectorAll('.secao').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.aba-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        btn.classList.add('active');
-        document.getElementById('recibo').style.display = 'none';
-    }
+    let dAgua = null; let dLuz = null;
+    const getD = () => new Date().toLocaleDateString('pt-br');
+
+    window.onload = () => {
+        document.getElementById('a-total-ant').value = localStorage.getItem('a-total-atu') || '';
+        document.getElementById('a-nanda-ant').value = localStorage.getItem('a-nanda-atu') || '';
+        document.getElementById('a-leia-ant').value = localStorage.getItem('a-leia-atu') || '';
+        document.getElementById('l-total-ant').value = localStorage.getItem('l-total-atu') || '';
+        document.getElementById('l-nanda-ant').value = localStorage.getItem('l-nanda-atu') || '';
+    };
 
     function money(i) {
         let v = i.value.replace(/\D/g, "");
@@ -82,62 +90,124 @@
         i.value = "R$ " + v;
     }
 
+    function formatNum(n) { return Number(n).toString(); }
     function toNum(v) { return parseFloat(v.replace(/[^\d,]/g, '').replace(',', '.')) || 0; }
     function toReal(n) { return n.toLocaleString('pt-br', {style: 'currency', currency: 'BRL'}); }
 
-    function getD() {
-        const d = new Date();
-        const m = ["JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO", "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"];
-        return `${d.getDate()} DE ${m[d.getMonth()]}`;
-    }
-
-    function htmlBloco(nome, totalC, taxa, consumoVal, m3kw, totalInd, unidade) {
-        return `
-            <div class="bloco">
-                <b style="font-size: 22px;">${nome}:</b><br>
-                TOTAL CONTA: <b>${toReal(totalC)}</b><br>
-                TAXA: <b>${toReal(taxa)}</b><br>
-                CONSUMO: ${m3kw} ${unidade} (<b>${toReal(consumoVal)}</b>)<br>
-                TOTAL A PAGAR: <span class="destaque">${toReal(totalInd)}</span>
-            </div>`;
+    function tab(btn, id) {
+        document.querySelectorAll('.secao').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.aba-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        btn.classList.add('active');
+        document.getElementById('recibo').style.display = 'none';
     }
 
     function calcAgua() {
-        const totalRs = toNum(document.getElementById('a-total').value);
+        const total = toNum(document.getElementById('a-total').value);
         const taxaT = toNum(document.getElementById('a-taxa').value);
-        const m3T = parseFloat(document.getElementById('a-total-m3').value) || 1;
-        const nandaM3 = parseFloat(document.getElementById('a-nanda-c').value) || 0;
-        const leiaM3 = parseFloat(document.getElementById('a-leia-c').value) || 0;
-        const carlaM3 = m3T - nandaM3 - leiaM3;
-        const preco = (totalRs - taxaT) / m3T;
-        const taxaP = taxaT / 3;
+        const tAnt = parseFloat(document.getElementById('a-total-ant').value)||0;
+        const tAtu = parseFloat(document.getElementById('a-total-atu').value)||0;
+        const nAnt = parseFloat(document.getElementById('a-nanda-ant').value)||0;
+        const nAtu = parseFloat(document.getElementById('a-nanda-atu').value)||0;
+        const lAnt = parseFloat(document.getElementById('a-leia-ant').value)||0;
+        const lAtu = parseFloat(document.getElementById('a-leia-atu').value)||0;
 
-        const r = document.getElementById('recibo');
-        r.innerHTML = `<span class="data-header">DATA: ${getD()}</span>
-            <center><b style="font-size: 20px;">DEMONSTRATIVO DE ÁGUA</b></center>
-            ${htmlBloco('NANDA FILHA', totalRs, taxaP, nandaM3 * preco, nandaM3, (nandaM3 * preco) + taxaP, 'm³')}
-            ${htmlBloco('LEIA', totalRs, taxaP, leiaM3 * preco, leiaM3, (leiaM3 * preco) + taxaP, 'm³')}
-            ${htmlBloco('CARLA', totalRs, taxaP, carlaM3 * preco, carlaM3.toFixed(1), (carlaM3 * preco) + taxaP, 'm³')}`;
-        r.style.display = 'block';
+        const m3T = tAtu - tAnt;
+        const m3N = nAtu - nAnt;
+        const m3L = lAtu - lAnt;
+        const m3C = m3T - m3N - m3L;
+        const preco = m3T > 0 ? (total - taxaT) / m3T : 0;
+        const taxaI = taxaT / 3;
+
+        localStorage.setItem('a-total-atu', tAtu);
+        localStorage.setItem('a-nanda-atu', nAtu);
+        localStorage.setItem('a-leia-atu', lAtu);
+
+        dAgua = {
+            f: { ant: nAnt, atu: nAtu, cons: m3N, valor: (m3N * preco), taxa: taxaI, total: (m3N * preco) + taxaI },
+            l: { ant: lAnt, atu: lAtu, cons: m3L, valor: (m3L * preco), taxa: taxaI, total: (m3L * preco) + taxaI },
+            c: { ant: (tAtu-m3C), atu: tAtu, cons: m3C, valor: (m3C * preco), taxa: taxaI, total: (m3C * preco) + taxaI },
+            data: getD()
+        };
+        exibirIndividual('ÁGUA', dAgua, 'm³');
     }
 
     function calcLuz() {
-        const totalRs = toNum(document.getElementById('l-total').value);
+        const total = toNum(document.getElementById('l-total').value);
         const taxaT = toNum(document.getElementById('l-taxa').value);
-        const kwT = parseFloat(document.getElementById('l-total-kw').value) || 1;
-        const nandaKw = parseFloat(document.getElementById('l-nanda-c').value) || 0;
-        const carlaKw = kwT - nandaKw;
-        const preco = (totalRs - taxaT) / kwT;
-        const taxaP = taxaT / 2;
+        const tAnt = parseFloat(document.getElementById('l-total-ant').value)||0;
+        const tAtu = parseFloat(document.getElementById('l-total-atu').value)||0;
+        const nAnt = parseFloat(document.getElementById('l-nanda-ant').value)||0;
+        const nAtu = parseFloat(document.getElementById('l-nanda-atu').value)||0;
 
-        const r = document.getElementById('recibo');
-        r.innerHTML = `<span class="data-header">DATA: ${getD()}</span>
-            <center><b style="font-size: 20px;">DEMONSTRATIVO DE LUZ</b></center>
-            ${htmlBloco('NANDA FILHA', totalRs, taxaP, nandaKw * preco, nandaKw, (nandaKw * preco) + taxaP, 'kWh')}
-            ${htmlBloco('CARLA', totalRs, taxaP, carlaKw * preco, carlaKw, (carlaKw * preco) + taxaP, 'kWh')}`;
-        r.style.display = 'block';
+        const kwT = tAtu - tAnt;
+        const kwN = nAtu - nAnt;
+        const kwC = kwT - kwN;
+        const preco = kwT > 0 ? (total - taxaT) / kwT : 0;
+        const taxaI = taxaT / 2;
+
+        localStorage.setItem('l-total-atu', tAtu);
+        localStorage.setItem('l-nanda-atu', nAtu);
+
+        dLuz = {
+            f: { ant: nAnt, atu: nAtu, cons: kwN, valor: (kwN * preco), taxa: taxaI, total: (kwN * preco) + taxaI },
+            c: { ant: (tAtu-kwC), atu: tAtu, cons: kwC, valor: (kwC * preco), taxa: taxaI, total: (kwC * preco) + taxaI },
+            data: getD()
+        };
+        exibirIndividual('LUZ', dLuz, 'kWh');
+    }
+
+    function exibirIndividual(titulo, dados, un) {
+        let h = `<span class="data-header">RECIBO ${titulo} - ${dados.data}</span>`;
+        h += blocoInd('FERNANDA', dados.f, un);
+        if(dados.l) h += blocoInd('LEIA', dados.l, un);
+        h += blocoInd('CARLA', dados.c, un);
+        document.getElementById('recibo').innerHTML = h;
+        document.getElementById('recibo').style.display = 'block';
+    }
+
+    function blocoInd(nome, d, un) {
+        return `<div class="bloco"><b style="font-size:20px;">${nome} (${getD()})</b><br>
+                Leitura Anterior: <b>${formatNum(d.ant)}</b><br>
+                Leitura Atual: <b>${formatNum(d.atu)}</b><br>
+                Consumo: ${formatNum(d.cons)} ${un} (${toReal(d.valor)})<br>
+                Taxa: ${toReal(d.taxa)}<br>
+                TOTAL: <span class="destaque-total">${toReal(d.total)}</span></div>`;
+    }
+
+    function gerarResumo() {
+        if(!dAgua || !dLuz) return alert("Gere Água e Luz primeiro!");
+        let h = `<span class="data-header">RESUMO COMPLETO - ${getD()}</span>`;
+        
+        const pessoas = [
+            { nome: 'FERNANDA', agua: dAgua.f, luz: dLuz.f },
+            { nome: 'CARLA', agua: dAgua.c, luz: dLuz.c },
+            { nome: 'LEIA', agua: dAgua.l, luz: null }
+        ];
+
+        pessoas.forEach(p => {
+            h += `<div class="bloco"><b style="font-size:21px;">${p.nome} (${getD()})</b>`;
+            if(p.agua) {
+                h += `<div class="destaque-agua">💧 ÁGUA<br>
+                      Leitura Anterior: <b>${formatNum(p.agua.ant)}</b><br>
+                      Leitura Atual: <b>${formatNum(p.agua.atu)}</b><br>
+                      Consumo: <b>${formatNum(p.agua.cons)}m³</b> (${toReal(p.agua.valor)})<br>
+                      Taxa: ${toReal(p.agua.taxa)} | Subtotal: <b>${toReal(p.agua.total)}</b></div>`;
+            }
+            if(p.luz) {
+                h += `<div class="destaque-luz">⚡ LUZ<br>
+                      Leitura Anterior: <b>${formatNum(p.luz.ant)}</b><br>
+                      Leitura Atual: <b>${formatNum(p.luz.atu)}</b><br>
+                      Consumo: <b>${formatNum(p.luz.cons)}kWh</b> (${toReal(p.luz.valor)})<br>
+                      Taxa: ${toReal(p.luz.taxa)} | Subtotal: <b>${toReal(p.luz.total)}</b></div>`;
+            }
+            let soma = (p.agua ? p.agua.total : 0) + (p.luz ? p.luz.total : 0);
+            h += `SOMA TOTAL: <span class="destaque-total">${toReal(soma)}</span></div>`;
+        });
+
+        document.getElementById('recibo').innerHTML = h;
+        document.getElementById('recibo').style.display = 'block';
     }
 </script>
-
 </body>
 </html>
