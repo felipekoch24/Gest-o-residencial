@@ -14,6 +14,8 @@
         .secao.active { display: block; }
 
         .grid-leitura { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .grid-nomes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px; }
+        .grid-nomes input { padding: 8px; font-size: 13px; text-align: center; }
         label { display: block; font-weight: bold; font-size: 11px; margin-top: 8px; color: #444; text-transform: uppercase; }
         input { width: 100%; padding: 12px; font-size: 18px; font-weight: bold; text-align: center; border: 2px solid #bbb; border-radius: 8px; box-sizing: border-box; }
         
@@ -42,15 +44,21 @@
 </div>
 
 <div id="agua" class="secao active">
+    <div class="grid-nomes">
+        <input type="text" id="nome1" value="FERNANDA" placeholder="Nome 1" oninput="salvarNomes()">
+        <input type="text" id="nome2" value="LEIA" placeholder="Nome 2" oninput="salvarNomes()">
+        <input type="text" id="nome3" value="CARLA" placeholder="Nome 3" oninput="salvarNomes()">
+    </div>
+
     <label>VALOR TOTAL CONTA (R$)</label>
     <input type="text" id="a-total" placeholder="R$ 0,00" oninput="money(this)">
     <label>TAXA FIXA TOTAL (R$)</label>
     <input type="text" id="a-taxa" value="R$ 82,06" oninput="money(this)">
     <label>LEITURA TOTAL CONTA (m³)</label>
     <div class="grid-leitura"><input type="number" id="a-total-ant" placeholder="Ant."><input type="number" id="a-total-atu" placeholder="Atu."></div>
-    <label>LEITURA FERNANDA (m³)</label>
+    <label>LEITURA <span id="lbl-n1">FERNANDA</span> (m³)</label>
     <div class="grid-leitura"><input type="number" id="a-nanda-ant" placeholder="Ant."><input type="number" id="a-nanda-atu" placeholder="Atu."></div>
-    <label>LEITURA LEIA (m³)</label>
+    <label>LEITURA <span id="lbl-n2">LEIA</span> (m³)</label>
     <div class="grid-leitura"><input type="number" id="a-leia-ant" placeholder="Ant."><input type="number" id="a-leia-atu" placeholder="Atu."></div>
     <button class="btn-gerar" onclick="calcAgua()">GERAR RECIBO ÁGUA</button>
     
@@ -67,7 +75,7 @@
     <input type="text" id="l-taxa" oninput="money(this)">
     <label>LEITURA TOTAL CONTA (kWh)</label>
     <div class="grid-leitura"><input type="number" id="l-total-ant" placeholder="Ant."><input type="number" id="l-total-atu" placeholder="Atu."></div>
-    <label>LEITURA FERNANDA (kWh)</label>
+    <label>LEITURA <span id="lbl-n1-luz">FERNANDA</span> (kWh)</label>
     <div class="grid-leitura"><input type="number" id="l-nanda-ant" placeholder="Ant."><input type="number" id="l-nanda-atu" placeholder="Atu."></div>
     <button class="btn-gerar" onclick="calcLuz()">GERAR RECIBO LUZ</button>
 
@@ -89,8 +97,31 @@
     const getD = () => new Date().toLocaleDateString('pt-br');
 
     window.onload = () => {
+        carregarNomes();
         carregarDados();
     };
+
+    function salvarNomes() {
+        localStorage.setItem('nome1', document.getElementById('nome1').value);
+        localStorage.setItem('nome2', document.getElementById('nome2').value);
+        localStorage.setItem('nome3', document.getElementById('nome3').value);
+        atualizarLabels();
+    }
+
+    function carregarNomes() {
+        document.getElementById('nome1').value = localStorage.getItem('nome1') || 'FERNANDA';
+        document.getElementById('nome2').value = localStorage.getItem('nome2') || 'LEIA';
+        document.getElementById('nome3').value = localStorage.getItem('nome3') || 'CARLA';
+        atualizarLabels();
+    }
+
+    function atualizarLabels() {
+        const n1 = document.getElementById('nome1').value;
+        const n2 = document.getElementById('nome2').value;
+        document.getElementById('lbl-n1').textContent = n1;
+        document.getElementById('lbl-n2').textContent = n2;
+        document.getElementById('lbl-n1-luz').textContent = n1;
+    }
 
     function carregarDados() {
         document.getElementById('a-total-ant').value = localStorage.getItem('a-total-atu') || '';
@@ -103,7 +134,7 @@
     function resetA() {
         if(confirm("Deseja apagar os valores salvos de Água?")) {
             ['a-total-atu', 'a-nanda-atu', 'a-leia-atu'].forEach(k => localStorage.removeItem(k));
-            document.querySelectorAll('#agua input').forEach(i => i.value = i.id === 'a-taxa' ? 'R$ 82,06' : '');
+            document.querySelectorAll('#agua input:not(#nome1):not(#nome2):not(#nome3)').forEach(i => i.value = i.id === 'a-taxa' ? 'R$ 82,06' : '');
             dAgua = null;
             document.getElementById('recibo').style.display = 'none';
         }
@@ -138,6 +169,10 @@
     }
 
     function calcAgua() {
+        const n1 = document.getElementById('nome1').value;
+        const n2 = document.getElementById('nome2').value;
+        const n3 = document.getElementById('nome3').value;
+
         const total = toNum(document.getElementById('a-total').value);
         const taxaT = toNum(document.getElementById('a-taxa').value);
         const tAnt = parseFloat(document.getElementById('a-total-ant').value)||0;
@@ -159,15 +194,18 @@
         localStorage.setItem('a-leia-atu', lAtu);
 
         dAgua = {
-            f: { ant: nAnt, atu: nAtu, cons: m3N, valor: (m3N * preco), taxa: taxaI, total: (m3N * preco) + taxaI },
-            l: { ant: lAnt, atu: lAtu, cons: m3L, valor: (m3L * preco), taxa: taxaI, total: (m3L * preco) + taxaI },
-            c: { ant: (tAtu-m3C), atu: tAtu, cons: m3C, valor: (m3C * preco), taxa: taxaI, total: (m3C * preco) + taxaI },
+            f: { nome: n1, ant: nAnt, atu: nAtu, cons: m3N, valor: (m3N * preco), taxa: taxaI, total: (m3N * preco) + taxaI },
+            l: { nome: n2, ant: lAnt, atu: lAtu, cons: m3L, valor: (m3L * preco), taxa: taxaI, total: (m3L * preco) + taxaI },
+            c: { nome: n3, ant: (tAtu-m3C), atu: tAtu, cons: m3C, valor: (m3C * preco), taxa: taxaI, total: (m3C * preco) + taxaI },
             data: getD()
         };
         exibirIndividual('ÁGUA', dAgua, 'm³');
     }
 
     function calcLuz() {
+        const n1 = document.getElementById('nome1').value;
+        const n3 = document.getElementById('nome3').value;
+
         const total = toNum(document.getElementById('l-total').value);
         const taxaT = toNum(document.getElementById('l-taxa').value);
         const tAnt = parseFloat(document.getElementById('l-total-ant').value)||0;
@@ -185,8 +223,8 @@
         localStorage.setItem('l-nanda-atu', nAtu);
 
         dLuz = {
-            f: { ant: nAnt, atu: nAtu, cons: kwN, valor: (kwN * preco), taxa: taxaI, total: (kwN * preco) + taxaI },
-            c: { ant: (tAtu-kwC), atu: tAtu, cons: kwC, valor: (kwC * preco), taxa: taxaI, total: (kwC * preco) + taxaI },
+            f: { nome: n1, ant: nAnt, atu: nAtu, cons: kwN, valor: (kwN * preco), taxa: taxaI, total: (kwN * preco) + taxaI },
+            c: { nome: n3, ant: (tAtu-kwC), atu: tAtu, cons: kwC, valor: (kwC * preco), taxa: taxaI, total: (kwC * preco) + taxaI },
             data: getD()
         };
         exibirIndividual('LUZ', dLuz, 'kWh');
@@ -194,9 +232,9 @@
 
     function exibirIndividual(titulo, dados, un) {
         let h = `<span class="data-header">RECIBO ${titulo} - ${dados.data}</span>`;
-        h += blocoInd('FERNANDA', dados.f, un);
-        if(dados.l) h += blocoInd('LEIA', dados.l, un);
-        h += blocoInd('CARLA', dados.c, un);
+        h += blocoInd(dados.f.nome, dados.f, un);
+        if(dados.l) h += blocoInd(dados.l.nome, dados.l, un);
+        h += blocoInd(dados.c.nome, dados.c, un);
         document.getElementById('recibo').innerHTML = h;
         document.getElementById('recibo').style.display = 'block';
     }
@@ -214,29 +252,26 @@
         if(!dAgua || !dLuz) return alert("Gere Água e Luz primeiro!");
         let h = `<span class="data-header">RESUMO COMPLETO - ${getD()}</span>`;
         
-        const pessoas = [
-            { nome: 'FERNANDA', agua: dAgua.f, luz: dLuz.f },
-            { nome: 'CARLA', agua: dAgua.c, luz: dLuz.c },
-            { nome: 'LEIA', agua: dAgua.l, luz: null }
-        ];
+        const pessoas = [dAgua.f, dAgua.l, dAgua.c];
 
         pessoas.forEach(p => {
             h += `<div class="bloco"><b style="font-size:21px;">${p.nome} (${getD()})</b>`;
-            if(p.agua) {
+            if(p) {
                 h += `<div class="destaque-agua">💧 ÁGUA<br>
-                      Leitura Anterior: <b>${formatNum(p.agua.ant)}</b><br>
-                      Leitura Atual: <b>${formatNum(p.agua.atu)}</b><br>
-                      Consumo: <b>${formatNum(p.agua.cons)}m³</b> (${toReal(p.agua.valor)})<br>
-                      Taxa: ${toReal(p.agua.taxa)} | Subtotal: <b>${toReal(p.agua.total)}</b></div>`;
+                      Leitura Anterior: <b>${formatNum(p.ant)}</b><br>
+                      Leitura Atual: <b>${formatNum(p.atu)}</b><br>
+                      Consumo: <b>${formatNum(p.cons)}m³</b> (${toReal(p.valor)})<br>
+                      Taxa: ${toReal(p.taxa)} | Subtotal: <b>${toReal(p.total)}</b></div>`;
             }
-            if(p.luz) {
+            const lPessoa = dLuz.f.nome === p.nome ? dLuz.f : dLuz.c.nome === p.nome ? dLuz.c : null;
+            if(lPessoa) {
                 h += `<div class="destaque-luz">⚡ LUZ<br>
-                      Leitura Anterior: <b>${formatNum(p.luz.ant)}</b><br>
-                      Leitura Atual: <b>${formatNum(p.luz.atu)}</b><br>
-                      Consumo: <b>${formatNum(p.luz.cons)}kWh</b> (${toReal(p.luz.valor)})<br>
-                      Taxa: ${toReal(p.luz.taxa)} | Subtotal: <b>${toReal(p.luz.total)}</b></div>`;
+                      Leitura Anterior: <b>${formatNum(lPessoa.ant)}</b><br>
+                      Leitura Atual: <b>${formatNum(lPessoa.atu)}</b><br>
+                      Consumo: <b>${formatNum(lPessoa.cons)}kWh</b> (${toReal(lPessoa.valor)})<br>
+                      Taxa: ${toReal(lPessoa.taxa)} | Subtotal: <b>${toReal(lPessoa.total)}</b></div>`;
             }
-            let soma = (p.agua ? p.agua.total : 0) + (p.luz ? p.luz.total : 0);
+            let soma = p.total + (lPessoa ? lPessoa.total : 0);
             h += `SOMA TOTAL: <span class="destaque-total">${toReal(soma)}</span></div>`;
         });
 
