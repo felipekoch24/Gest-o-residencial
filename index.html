@@ -7,7 +7,7 @@
     <style>
         body { font-family: sans-serif; background-color: #f0f2f5; margin: 0; padding: 10px; color: #000; }
         .abas { display: flex; gap: 5px; margin-bottom: 10px; }
-        .aba-btn { flex: 1; padding: 15px 5px; border: none; border-radius: 8px; font-weight: 900; font-size: 13px; cursor: pointer; background: #ccc; text-transform: uppercase; }
+        .aba-btn { flex: 1; padding: 15px 5px; border: none; border-radius: 8px; font-weight: 900; font-size: 12px; cursor: pointer; background: #ccc; text-transform: uppercase; }
         .aba-btn.active { background: #004488; color: white; }
 
         .secao { display: none; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 10px; }
@@ -41,6 +41,7 @@
     <button class="aba-btn active" onclick="tab(this, 'agua')">💧 ÁGUA</button>
     <button class="aba-btn" onclick="tab(this, 'luz')">⚡ LUZ</button>
     <button class="aba-btn" onclick="tab(this, 'resumo')">📋 RESUMO</button>
+    <button class="aba-btn" onclick="tab(this, 'historico')">📜 HIST</button>
 </div>
 
 <div id="agua" class="secao active">
@@ -89,6 +90,15 @@
     <button class="btn-gerar" style="background: #004488;" onclick="gerarResumo()">GERAR RESUMO COMPLETO</button>
 </div>
 
+<div id="historico" class="secao">
+    <h3 style="margin-top:0; color:#004488;">📜 HISTÓRICO DE RECIBOS</h3>
+    <div id="lista-historico" style="font-size: 15px; line-height: 1.5; margin-bottom: 15px;">Nenhum recibo salvo ainda.</div>
+    <div class="area-reset">
+        <span style="color:red; font-size:10px; font-weight:bold; display:block; margin-bottom:5px;">APAGAR REGISTROS</span>
+        <button class="btn-reset" onclick="limparHistorico()">LIMPAR HISTÓRICO</button>
+    </div>
+</div>
+
 <div id="recibo"></div>
 <footer>SISTEMA DE GESTÃO - FELIPE</footer>
 
@@ -99,6 +109,7 @@
     window.onload = () => {
         carregarNomes();
         carregarDados();
+        carregarHistoricoNaTela();
     };
 
     function salvarNomes() {
@@ -116,8 +127,8 @@
     }
 
     function atualizarLabels() {
-        const n1 = document.getElementById('nome1').value;
-        const n2 = document.getElementById('nome2').value;
+        const n1 = document.getElementById('nome1').value || 'NOME 1';
+        const n2 = document.getElementById('nome2').value || 'NOME 2';
         document.getElementById('lbl-n1').textContent = n1;
         document.getElementById('lbl-n2').textContent = n2;
         document.getElementById('lbl-n1-luz').textContent = n1;
@@ -165,13 +176,58 @@
         document.querySelectorAll('.aba-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         btn.classList.add('active');
-        document.getElementById('recibo').style.display = 'none';
+        if(id !== 'historico') {
+            document.getElementById('recibo').style.display = 'none';
+        } else {
+            document.getElementById('recibo').style.display = 'none';
+            carregarHistoricoNaTela();
+        }
+    }
+
+    function salvarNoHistorico(htmlConteudo) {
+        let historico = JSON.parse(localStorage.getItem('historico_recibos') || '[]');
+        historico.unshift({ data: getD(), conteudo: htmlConteudo });
+        if(historico.length > 10) historico.pop();
+        localStorage.setItem('historico_recibos', JSON.stringify(historico));
+    }
+
+    function carregarHistoricoNaTela() {
+        let historico = JSON.parse(localStorage.getItem('historico_recibos') || '[]');
+        let divHistorico = document.getElementById('lista-historico');
+        if(historico.length === 0) {
+            divHistorico.innerHTML = "Nenhum recibo salvo no histórico ainda.";
+            return;
+        }
+        let html = "";
+        historico.forEach((item, index) => {
+            html += `<div style="border: 1px solid #ccc; padding: 10px; border-radius: 8px; margin-bottom: 10px; background: #fafafa;">
+                        <b>Registro #${historico.length - index} - ${item.data}</b>
+                        <button style="float: right; background: #cc0000; color: white; border: none; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;" onclick="deletarItemHistorico(${index})">Excluir</button>
+                        <hr style="margin: 5px 0; border:0; border-top:1px solid #ddd;">
+                        <div style="font-size: 14px;">${item.conteudo}</div>
+                     </div>`;
+        });
+        divHistorico.innerHTML = html;
+    }
+
+    function limparHistorico() {
+        if(confirm("Deseja apagar todo o histórico?")) {
+            localStorage.removeItem('historico_recibos');
+            carregarHistoricoNaTela();
+        }
+    }
+
+    function deletarItemHistorico(index) {
+        let historico = JSON.parse(localStorage.getItem('historico_recibos') || '[]');
+        historico.splice(index, 1);
+        localStorage.setItem('historico_recibos', JSON.stringify(historico));
+        carregarHistoricoNaTela();
     }
 
     function calcAgua() {
-        const n1 = document.getElementById('nome1').value;
-        const n2 = document.getElementById('nome2').value;
-        const n3 = document.getElementById('nome3').value;
+        const n1 = document.getElementById('nome1').value || 'Pessoa 1';
+        const n2 = document.getElementById('nome2').value || 'Pessoa 2';
+        const n3 = document.getElementById('nome3').value || 'Pessoa 3';
 
         const total = toNum(document.getElementById('a-total').value);
         const taxaT = toNum(document.getElementById('a-taxa').value);
@@ -203,8 +259,8 @@
     }
 
     function calcLuz() {
-        const n1 = document.getElementById('nome1').value;
-        const n3 = document.getElementById('nome3').value;
+        const n1 = document.getElementById('nome1').value || 'Pessoa 1';
+        const n3 = document.getElementById('nome3').value || 'Pessoa 3';
 
         const total = toNum(document.getElementById('l-total').value);
         const taxaT = toNum(document.getElementById('l-taxa').value);
@@ -235,8 +291,11 @@
         h += blocoInd(dados.f.nome, dados.f, un);
         if(dados.l) h += blocoInd(dados.l.nome, dados.l, un);
         h += blocoInd(dados.c.nome, dados.c, un);
+        
         document.getElementById('recibo').innerHTML = h;
         document.getElementById('recibo').style.display = 'block';
+        
+        salvarNoHistorico(h);
     }
 
     function blocoInd(nome, d, un) {
@@ -249,7 +308,7 @@
     }
 
     function gerarResumo() {
-        if(!dAgua || !dLuz) return alert("Gere Água e Luz primeiro!");
+        if(!dAgua || !dLuz) return alert("Gere Água e Luz primeiro nesta sessão antes de criar o resumo completo!");
         let h = `<span class="data-header">RESUMO COMPLETO - ${getD()}</span>`;
         
         const pessoas = [dAgua.f, dAgua.l, dAgua.c];
@@ -277,6 +336,8 @@
 
         document.getElementById('recibo').innerHTML = h;
         document.getElementById('recibo').style.display = 'block';
+
+        salvarNoHistorico(h);
     }
 </script>
 </body>
